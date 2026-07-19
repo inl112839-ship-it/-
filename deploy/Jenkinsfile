@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = 'ops-service'
+        REGISTRY = 'registry.cn-shenzhen.aliyuncs.com/ops'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out source code from Git...'
+                git branch: 'main', url: 'https://github.com/inl112839-ship-it/-.git'
+            }
+        }
+
+        stage('Code Lint & Test') {
+            steps {
+                echo 'Running Flake8 & Python Unit Tests...'
+                sh 'python3 -m unittest discover -s tests'
+            }
+        }
+
+        stage('Build & Push Docker Image') {
+            steps {
+                echo "Building Docker image: ${APP_NAME}:${BUILD_NUMBER}..."
+                // sh "docker build -t ${REGISTRY}/${APP_NAME}:${BUILD_NUMBER} ."
+            }
+        }
+
+        stage('Deploy to Staging') {
+            steps {
+                echo 'Deploying to Staging Environment...'
+                // sh 'docker-compose down && docker-compose up -d'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline execution finished.'
+        }
+    }
+}
